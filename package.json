@@ -1,0 +1,24 @@
+{
+  "name": "hackathonAPI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/afreeland/hackathonAPI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/afreeland/hackathonAPI/issues"
+  },
+  "homepage": "https://github.com/afreeland/hackathonAPI#readme",
+  "dependencies": {
+    "express": "^4.16.1",
+    "mongodb": "^2.2.31"
+  }
+}
