@@ -18,6 +18,22 @@ module.exports = function(app, mongodbConn){
         });
     })
 
+    app.get('/summoner/:name', (req, res) => {
+        // Connect using MongoClient
+        MongoClient.connect(url, function(err, db) {
+            
+            var users = db.collection('users');
+            let _body = req.body;
+            // Check for summoner, insert if not present or update if it is
+            users.findOne({summoner: req.params.name }, (err, doc) => {
+                if(err)
+                    return res.send('Failed: ', + err);
+
+                res.send(doc);
+            })
+        });
+    })
+
     app.get('/register', (req, res) => {
         console.log('you hit');
     })
