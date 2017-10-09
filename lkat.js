@@ -1,6 +1,8 @@
 const axios = require('axios');
 var MongoClient = require('mongodb').MongoClient;
 const async = require('async');
+const fs = require('fs');
+const path = require('path');
 
 function getSummoner(name, callback) {
     axios.get('https://na1.api.riotgames.com/lol/summoner/v3/summoners/by-name/Siltharious?api_key=RGAPI-7ae92fa3-165e-4a9a-96fa-1f7a657c3e0d')
@@ -28,7 +30,7 @@ function getMatches(accountId, callback) {
 module.exports = function(app, mongodbConn){
 
     // Connection url
-    var url = 'mongodb://' + mongodbConn.user + ':' + mongodbConn.pass + '@' + mongodbConn.host + ':' + mongodbConn.port + '/' + mongodbConn.db;
+    //var url = 'mongodb://' + mongodbConn.user + ':' + mongodbConn.pass + '@' + mongodbConn.host + ':' + mongodbConn.port + '/' + mongodbConn.db;
 
 
     app.get('/get_and_populate_matches', (req, res) => {
@@ -38,15 +40,11 @@ module.exports = function(app, mongodbConn){
             getMatches(summoner.accountId, (err, matches) => {
                 if (err) throw err;
 
-                // Write matches to database
-                //res.send(matches);
-                MongoClient.connect(url, function(err, db) {
+                matches.forEach(match => {
+                    match.summoner = req.query.name;
 
-                    var matchesCollection = db.collection('matches');
-                    var destCollection = db.collection('match-detail');
-                    matchesCollection.insert(matches, (err, result) => {
-                        if (err) throw err;
-
+                })
+                fs.writeFile(path.join(__dirname, 'data','matches.json'), JSON.stringify(matches, null, '  '));
                         console.log('Done inserting matches');
 
                         // Insert match details
@@ -72,31 +70,20 @@ module.exports = function(app, mongodbConn){
 
                         console.log('pushed everything into work array', workArray.length);
 
-                        async.parallelLimit(workArray, 5, function (err, results) {
+                        async.parallelLimit(workArray, 1, function (err, results) {
                             // Gotten all of match details
                             if (err) throw err;
                             console.log('got match details', matchDetails.length);
-                            // console.log('results ha', results);
-                            destCollection.insert(matchDetails, (err, results) => {
-                                if (err) throw err;
-                                console.log('inserted match details!');
-                                db.close();
+
+                            fs.writeFile(path.join(__dirname, 'data','match-details.json'), JSON.stringify(matchDetails, null, '  '));
+
                                 res.send({done: true});
-                            })
+
 
                         })
-
-
-
-
-                    })
-
-                })
 
             })
 
         })
-       //res.send(true);
     });
-
 };
