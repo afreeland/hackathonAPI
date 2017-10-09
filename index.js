@@ -38,6 +38,7 @@ app.get('/', function (req, res) {
 })
 
 require('./client.js')(app, mongodbConn);
+require('./lkat.js')(app, mongodbConn);
 
 app.listen(8000, function () {
   console.log('Example app listening on port 8000!')
